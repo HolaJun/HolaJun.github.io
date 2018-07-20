@@ -1,12 +1,11 @@
 permalink: /:year:month:day/:title
-url: #Your url here
-baseurl: /project
+url: http://github.com/holajun
+baseurl: ""
 
 # variables
-name: Your Site Name
-description: Your description here
+name: HolaJun
+description: helloworld
 google_verification: null
-
 
 # File management
 include: [".htaccess"]
