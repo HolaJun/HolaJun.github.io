@@ -1,6 +1,7 @@
 ---
-layout: 기본
+layout: default
 title: Ubuntu Nodejs설치
+tags: 기본
 ---
 
 ## STEP 1: nodejs 설치
