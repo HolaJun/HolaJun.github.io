@@ -1,3 +1,8 @@
+---
+layout: 기본
+title: Ubuntu Nodejs설치
+---
+
 ## STEP 1: nodejs 설치
 
 1. nodesource의 APT 저장소 추가
