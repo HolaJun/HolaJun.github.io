@@ -6,7 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 	<link rel="stylesheet" href="/assets/css/atom-one-light.css">
     
-        <title>Lorem Ipsum</title>
+        <title>Ubuntu Nodejs설치</title>
 		<link rel="stylesheet" type="text/css" href="/assets/css/002.css">
     
 	<link rel="stylesheet" href="/assets/css/font-awesome.min.css">
@@ -43,18 +43,10 @@
 				
 				
 				<li>
-					<a href="/tag/tag1/" title="tag1">
+					<a href="/tag/기본/" title="기본">
 						<img src="/assets/img/folder.ico" />
 						<!-- 태그이름 -->
-						tag1
-					</a>
-				</li>
-				
-				<li>
-					<a href="/tag/개인공부/" title="개인공부">
-						<img src="/assets/img/folder.ico" />
-						<!-- 태그이름 -->
-						개인공부
+						기본
 					</a>
 				</li>
 				
@@ -68,9 +60,9 @@
 			
 				<ul>
 					
-					<li><a href="/2018-07-25/aws" title="개인공부"><img src="/assets/img/file.ico" title="개인공부" />개인공부</a></li>
+					<li><a href="/2018-08-23/%EA%B8%B0%EB%B3%B8CS%EC%A0%95%EB%A6%AC" title="기본CS정리"><img src="/assets/img/file.ico" title="기본CS정리" />기본CS정리</a></li>
 					
-					<li><a href="/2017-08-31/lorem-ipsum" title="Lorem Ipsum"><img src="/assets/img/file.ico" title="Lorem Ipsum" />Lorem Ipsum</a></li>
+					<li><a href="/2018-08-05/Ubuntu-nodejs%EC%84%A4%EC%B9%98" title="Ubuntu Nodejs설치"><img src="/assets/img/file.ico" title="Ubuntu Nodejs설치" />Ubuntu Nodejs설치</a></li>
 					
 				</ul>
 			
@@ -88,20 +80,60 @@
         <div class="content">
 			<div class="post_title">
 				<img src="/assets/img/file.png" />
-				<h1>Lorem Ipsum</h1>
+				<h1>Ubuntu Nodejs설치</h1>
 				<a href="/"><div class="btn"><span class="fa fa-times"></span></div></a> <!-- 최소화 -->
 				<div class="btn btn_max"><span class="fa fa-window-maximize"></span></div> <!-- 최대화 -->
 				<div class="btn"><span class="fa fa-window-minimize"></span></div> <!-- 종료 -->
 			</div>
 			<ul class="topbar">
-				<li>August 31, 2017</li>
+				<li>August 5, 2018</li>
 			</ul>
 			<div class="post_content">
-        		<h2 id="lorem-ipsum">Lorem Ipsum</h2>
+        		<h2 id="step-1-nodejs-설치">STEP 1: nodejs 설치</h2>
 
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin enim nibh, suscipit sed rhoncus quis, blandit quis sapien. Ut congue pharetra rhoncus. Praesent finibus vitae urna quis cursus. Proin mollis elementum sapien, vitae viverra magna tincidunt a. Nullam tincidunt interdum dui ut ultricies. Maecenas pellentesque tellus ac mauris faucibus elementum. Nulla quis risus aliquam, pharetra neque non, dapibus augue. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Cras ullamcorper lacinia augue in placerat. Suspendisse lacinia massa id blandit varius. Mauris ultricies ultricies bibendum.</p>
+<ol>
+  <li>nodesource의 APT 저장소 추가</li>
+</ol>
 
-<p>Mauris eu lectus fermentum leo dictum hendrerit. Maecenas vel leo sit amet quam laoreet consequat vitae nec eros. Curabitur eleifend eu orci quis consectetur. Sed pretium tortor at consequat tincidunt. Nullam a tellus faucibus, dapibus tortor eget, ullamcorper metus. Aenean at aliquet metus. Aenean molestie metus rutrum, tincidunt nulla quis, tincidunt lorem. Morbi diam sem, rutrum vitae convallis eget, dignissim semper lacus. Curabitur ipsum diam, tincidunt in hendrerit sit amet, luctus vitae dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+<pre><code>curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+</code></pre>
+
+<ol>
+  <li>nodejs 설치</li>
+</ol>
+
+<pre><code>sudo apt-get install nodejs
+</code></pre>
+
+<ol>
+  <li>버전 확인</li>
+</ol>
+
+<pre><code>
+</code></pre>
+
+<h2 id="버전-확인">버전 확인</h2>
+
+<pre><code>node -v
+npm -v
+</code></pre>
+
+<h2 id="step-2-firebase-setting">STEP 2: firebase Setting</h2>
+
+<ol>
+  <li>firebase 설치</li>
+</ol>
+
+<pre><code>sudo npm install firebase-tools -g
+</code></pre>
+
+<ol>
+  <li>firebase CLI 로그인(현재 컴퓨터와 firebase를 연결하고 프로젝트에 대한 엑세스 허용 )</li>
+</ol>
+
+<pre><code>
+</code></pre>
+
 
 				
 					<br>
