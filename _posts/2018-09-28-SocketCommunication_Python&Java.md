@@ -262,4 +262,3 @@ public class MainActivity extends AppCompatActivity {
 
 - 어제까지 잘 되던 소켓통신이 오늘 갑자기 안될 때, 공유기 포트포워딩 IP주소 확인(변경되었을 가능성 높음)
 - 환경설정은 역시 윈도우보다 리눅스가 좋다
-
