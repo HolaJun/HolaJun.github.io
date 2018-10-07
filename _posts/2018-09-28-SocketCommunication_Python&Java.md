@@ -2,7 +2,7 @@
 
 
 
-### Python Server
+## Python Server
 
 ```python
 #-*- coding: utf-8 -*-
@@ -30,7 +30,7 @@ if __name__ == '__main__':
 
 
 
-### Java Client
+## Java Client
 
 ```java
 package sending;
@@ -94,11 +94,11 @@ public class SocketSendTest2 {
 
 
 
-### Android Client
+## Android Client
 
 
 
-##### MainActiity.java
+### MainActiity.java
 
 ```java
 package com.example.holajun.sockettest;
@@ -109,16 +109,25 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
 
+
 public class MainActivity extends AppCompatActivity {
     EditText input01;
+    TextView resultView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,11 +135,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         input01 = (EditText) findViewById(R.id.input01);
-
         Button button01 = (Button) findViewById(R.id.button01);
+
         button01.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+
+                // addr = ip주소
                 String addr = input01.getText().toString().trim();
+                System.out.println("▣ ip값: " + addr);
 
                 ConnectThread thread = new ConnectThread(addr);
                 thread.start();
@@ -147,26 +159,49 @@ public class MainActivity extends AppCompatActivity {
         }
         public void run() {
             try {
-                String str = "helloworld";
+                String str = "[Client Send] helloworld";
                 int port = 5555;
                 Socket sock = new Socket(hostname, port);
 
-                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream(), "UTF-8"));
+                // 서버로 데이터 보내기
+                BufferedWriter bw = new BufferedWriter(
+                        new OutputStreamWriter(sock.getOutputStream(), "UTF-8")
+                );
                 bw.write(str + "\n");
                 bw.flush();
 
-                /*
-                ObjectOutputStream outstream = new ObjectOutputStream(sock.getOutputStream());
-                outstream.writeObject("Hello AndroidTown on Android");
-                outstream.flush();
+                // 서버로부터 데이터 받기
+                BufferedReader mIn = new BufferedReader(
+                        new InputStreamReader(sock.getInputStream(), "UTF-8")
+                );
+                String jsonVar = mIn.readLine();
+                jsonVar = "[" + jsonVar + "]";
 
-                ObjectInputStream instream = new ObjectInputStream(sock.getInputStream());
-                String obj = (String) instream.readObject();
+                System.out.println("▣ 서버로부터 받은 메세지: " + jsonVar);
 
-                Log.d("MAinActivity", "서버에서 받은 메시지: " + obj);
-*/
+                System.out.println("jsonVar: " + jsonVar);
+
+                JsonParser jsonParser = new JsonParser();
+                JsonArray jsonArray = (JsonArray) jsonParser.parse(jsonVar);
+
+                for(int i=0; i<jsonArray.size(); i++) {
+                    JsonObject object = (JsonObject) jsonArray.get(i);
+                    String id = object.get("id").getAsString();
+                    String name = object.get("name").getAsString();
+
+                    System.out.println("[JSON]id: " + id);
+                    System.out.println("[JSON]name: " + name);
+                }
+
+//
+//                ObjectInputStream inputStream = new ObjectInputStream(sock.getInputStream());
+//                Object input = inputStream.readObject();
+//                System.out.println("▣ 서버로부터 받은 메세지(ObjectInputStream): " + input);
+
+//                inputStream.close();
+
+
                 sock.close();
-
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -177,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-##### Manifest.xml
+### Manifest.xml
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -207,7 +242,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-##### activity_main.xml
+### activity_main.xml
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -254,6 +289,23 @@ public class MainActivity extends AppCompatActivity {
         tools:context=".MainActivity" />
 
 </LinearLayout>
+```
+
+
+
+## Gradle
+
+```
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.0'
+}
+
 ```
 
 
