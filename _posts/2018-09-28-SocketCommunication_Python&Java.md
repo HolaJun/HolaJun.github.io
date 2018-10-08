@@ -5,26 +5,118 @@
 ## Python Server
 
 ```python
-#-*- coding: utf-8 -*-
-
-## server.py
 import socket
+import pymongo
+import json
 
-def run_server(port=5555):
-  host = ''
-  with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.bind((host, port))
-    s.listen(1)
-    conn, addr = s.accept()
-    msg = conn.recv(1024)
-    print("type: ", type(msg))
-    print(msg.decode(encoding='utf-8'))
-    #print(f'{msg.decode()}')
-    conn.sendall(msg)
+sendMsgClient = ''
+result = []
+
+'''
+    MongoDB Connect
+'''
+def mongoConn():
+    # 정훈 MongoDB 정보
+    username = 'hoseo777'
+    password = 'hoseo777'
+
+    # 도경 MongoDB 정보
+    #username = 'hoseo_io'
+    #password = 'hoseo93'
+
+    # Connect AWS-Mongo
+    # 도경서버
+    #conn = pymongo.MongoClient('mongodb://%s:%s@222.118.242.165:1993' % (username, password))
+
+    # 정훈서버
+    #conn = pymongo.MongoClient('mongodb://%s:%s@124.28.41.13:27017' % (username, password))
+    conn = pymongo.MongoClient('mongodb://%s:%s@127.0.0.1:27017' % (username, password))
+    print('[Log] conn: ', conn)
+
+    # Show Database
+    db = conn.database_names()
+    print('[Log] DB List: ', db)
+
+    # Select Database
+    db = conn.get_database('stock')
+    print('[Log] Selected DB: ', db)
+
+    # Show Colletction
+    showColl = db.list_collection_names()
+    print('[Log] Collection List: ', showColl)
+
+    # Select Collection
+    collection = db.get_collection('stock_list')
+    print('[Log] Selected Collection: ', collection)
+
+    # find()에 인자가 없으면 해당 컬렉션의 전체 데이터 조회. return type = cursor
+    search = '다스코'
+    docs = list(collection.find(
+        {"item" : search }
+    ))
+
+    print('검색 조회')
+    for result in docs:
+        print(result)
+        print('reuslt type: ', type(result))
+
+    sendMsgClient = '종목명: {0}\n 시작가: {1}\n 최저가: {2}\n 종가: {3}\n 거래량: {4}'.format(result['item'], result['open'], result['low'], result['close'] ,result['volume'])
+    print(sendMsgClient)
+
+    #docs = collection.find(
+    #                        { "name" : "su" }
+    #                      )
+    #print("name이 su인 document")
+    #for result in docs:
+    #    print(result)
+
+'''
+    Socket Communication
+'''
+def runServer():
+    customer = {
+        "id": 152352,
+        "name": 'samKim'
+    }
+
+    # JSON 인코딩
+    jsonString = json.dumps(result)
+
+    host = 'Python Server'
+    port = 5556
+    msg3 = bytes(jsonString, encoding='utf-8')
+    msgClientFinal = bytes(sendMsgClient, encoding='utf-8')
+    conn = None
+
+    # AF_INET=IPv4, AF_INET6=IPv6, SOCK_STREAM=TCP
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.bind((host, port))
+        print("host={0}, port={1}".format(host, port))
+        sock.listen(1)
+
+        while True:
+            if conn is None:
+                # 클라이언트측으로부터 소켓 정보 받아옴
+                print('[연결을 기다리는 중...]')
+                conn, addr = sock.accept()
+                print('[연결 완료]')
+                print('[클라이언트 정보] ', addr)
+
+            else:
+                msg = conn.recv(1024)
+                # 전송받은 메세지 출력
+                mongoConn()
+                print(msg.decode(encoding='utf-8'))
+                # 클라이언트측으로 메세지 전송
+                conn.sendall(msg3)
+                print('클라이언트로 보낸 메세지: ', sendMsgClient)
+                if not msg: break
+
     conn.close()
 
 if __name__ == '__main__':
-  run_server()
+  runServer()
+
 
 ```
 
