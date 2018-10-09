@@ -10,7 +10,6 @@ import pymongo
 import json
 
 sendMsgClient = ''
-result = []
 
 '''
     MongoDB Connect
@@ -60,7 +59,7 @@ def mongoConn():
         print(result)
         print('reuslt type: ', type(result))
 
-    sendMsgClient = '종목명: {0}\n 시작가: {1}\n 최저가: {2}\n 종가: {3}\n 거래량: {4}'.format(result['item'], result['open'], result['low'], result['close'] ,result['volume'])
+    sendMsgClient = '종목명: {0}\n 시작가: {1}\n 최저가: {2}\n 종가: {3}\n 거래량: {4}'.format(result['item'], result['open'], result['low'], result['close'], result['volume'])
     print(sendMsgClient)
 
     #docs = collection.find(
@@ -70,53 +69,56 @@ def mongoConn():
     #for result in docs:
     #    print(result)
 
+
+def toJson(content):
+    result = json.dumps(content)
+    result = bytes(result, encoding='utf-8')
+    return result
+
+
 '''
     Socket Communication
 '''
 def runServer():
-    customer = {
-        "id": 152352,
-        "name": 'samKim'
-    }
-
-    # JSON 인코딩
-    jsonString = json.dumps(result)
-
-    host = 'Python Server'
-    port = 5556
-    msg3 = bytes(jsonString, encoding='utf-8')
-    msgClientFinal = bytes(sendMsgClient, encoding='utf-8')
+    host = ''  # 지정하지 않으면 가능한 모든 인터페이스를 뜻함
+    port = 5557
+    #msg3 = bytes(jsonString, encoding='utf-8')
+    #msgClientFinal = bytes(sendMsgClient, encoding='utf-8')
     conn = None
 
     # AF_INET=IPv4, AF_INET6=IPv6, SOCK_STREAM=TCP
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-        sock.bind((host, port))
-        print("host={0}, port={1}".format(host, port))
-        sock.listen(1)
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.bind((host, port))
+    print("[Log] server host={0}, server port={1}".format(host, port))
+    sock.listen(1) # 접속이 있을 때까지 기다림
 
-        while True:
-            if conn is None:
-                # 클라이언트측으로부터 소켓 정보 받아옴
-                print('[연결을 기다리는 중...]')
-                conn, addr = sock.accept()
-                print('[연결 완료]')
-                print('[클라이언트 정보] ', addr)
+    while True:
+        if conn is None:
+            # 클라이언트측으로부터 소켓 정보 받아옴
+            print('[Log] [연결을 기다리는 중...]')
+            # 접속 승인
+            conn, addr = sock.accept()
+            print('[Log] [연결 완료]')
+            print('[Log] [Conn 정보] ')
+            print('[Log] [클라이언트 정보] ', addr)
 
-            else:
-                msg = conn.recv(1024)
-                # 전송받은 메세지 출력
-                mongoConn()
-                print(msg.decode(encoding='utf-8'))
-                # 클라이언트측으로 메세지 전송
-                conn.sendall(msg3)
-                print('클라이언트로 보낸 메세지: ', sendMsgClient)
-                if not msg: break
-
-    conn.close()
+            conn.close()
+        else:
+            print('[Log] 데이터 받는 것을 기다리는 중...')
+            # 클라이언트로부터 받은 메세지
+            fromClientMsg = conn.recv(1024).decode(encoding='utf-8')
+            # 전송받은 메세지 출력
+            print('[Log] 클라이언트로부터 받은 메세지: ', fromClientMsg)
+            # 클라이언트측으로 메세지 전송
+            msg = {'item': '우진', 'open': 5350.0, 'low': 5350.0, 'close': 5700.0, 'volume': 612028.0}
+            toClientMsg = toJson(msg)
+            conn.sendall(toClientMsg)
+            print('[Log] 클라이언트로 보낸 메세지: ', toClientMsg)
+            #if not fromClientMsg: break
+        #
 
 if __name__ == '__main__':
   runServer()
-
 
 ```
 
