@@ -5,16 +5,19 @@
 ## Python Server
 
 ```python
+#-*- coding: utf-8 -*-#
+
 import socket
 import pymongo
 import json
 
 sendMsgClient = ''
+result = ''
 
 '''
     MongoDB Connect
 '''
-def mongoConn():
+def mongoConn(fromClientMsg):
     # 정훈 MongoDB 정보
     username = 'hoseo777'
     password = 'hoseo777'
@@ -48,19 +51,34 @@ def mongoConn():
     collection = db.get_collection('stock_list')
     print('[Log] Selected Collection: ', collection)
 
-    # find()에 인자가 없으면 해당 컬렉션의 전체 데이터 조회. return type = cursor
-    search = '다스코'
-    docs = list(collection.find(
-        {"item" : search }
-    ))
 
-    print('검색 조회')
+    # find()에 인자가 없으면 해당 컬렉션의 전체 데이터 조회. return type = cursor
+    search = fromClientMsg
+
+    docs = list(collection.find({"item" : search }))
+
+    global result
+    print('\n MongoDB 검색 결과')
     for result in docs:
         print(result)
         print('reuslt type: ', type(result))
 
-    sendMsgClient = '종목명: {0}\n 시작가: {1}\n 최저가: {2}\n 종가: {3}\n 거래량: {4}'.format(result['item'], result['open'], result['low'], result['close'], result['volume'])
-    print(sendMsgClient)
+    if not docs:  # 결과값이 없다면
+        print("[Log] {0}에 대한 검색 결과가 없습니다.".format(search))
+        result = ''
+        return result
+    else:
+        del result['_id']
+
+    print('[Log] docs: {0}, type of docs: {1} '.format(docs, type(docs)))
+
+
+
+    #endMsgClient = '종목명: {0}\n 시작가: {1}\n 최저가: {2}\n 종가: {3}\n 거래량: {4}'.format(result['item'], result['open'], result['low'], result['close'], result['volume'])
+    sendMsgClient = result
+    print('sendMsgClient: ', sendMsgClient)
+
+    return result
 
     #docs = collection.find(
     #                        { "name" : "su" }
@@ -81,7 +99,7 @@ def toJson(content):
 '''
 def runServer():
     host = ''  # 지정하지 않으면 가능한 모든 인터페이스를 뜻함
-    port = 5557
+    port = 5555
     #msg3 = bytes(jsonString, encoding='utf-8')
     #msgClientFinal = bytes(sendMsgClient, encoding='utf-8')
     conn = None
@@ -101,24 +119,35 @@ def runServer():
             print('[Log] [연결 완료]')
             print('[Log] [Conn 정보] ')
             print('[Log] [클라이언트 정보] ', addr)
-
-            conn.close()
         else:
-            print('[Log] 데이터 받는 것을 기다리는 중...')
+            print('[Log] 데이터 수신 대기중 ....')
             # 클라이언트로부터 받은 메세지
             fromClientMsg = conn.recv(1024).decode(encoding='utf-8')
             # 전송받은 메세지 출력
-            print('[Log] 클라이언트로부터 받은 메세지: ', fromClientMsg)
+            print('[Log] 클라이언트로부터 받은 메세지: ', fromClientMsg.strip())
+
+            resultValue = mongoConn(fromClientMsg)
+            if resultValue == '':
+                toClientMsg = '데이터가 존재하지 않습니다.'
+                conn.sendall(bytes(toClientMsg, encoding='utf-8'))
+                continue
+
+            print('resultVluae: ', resultValue)
+
             # 클라이언트측으로 메세지 전송
             msg = {'item': '우진', 'open': 5350.0, 'low': 5350.0, 'close': 5700.0, 'volume': 612028.0}
-            toClientMsg = toJson(msg)
+            print('msg의 타입: ', type(msg))
+            print('toJson() 이전의 resultValue 값: {0}, type: {1} '.format(resultValue, type(resultValue)))
+            toClientMsg = toJson(resultValue)
             conn.sendall(toClientMsg)
             print('[Log] 클라이언트로 보낸 메세지: ', toClientMsg)
+            print('[Log] toClient Type: ', type(toClientMsg))
             #if not fromClientMsg: break
-        #
+    conn.close()
 
 if __name__ == '__main__':
   runServer()
+
 
 ```
 
