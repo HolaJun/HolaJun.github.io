@@ -38,11 +38,15 @@ void selection_sort(int array[]) {
 	
 	for(i=0; i<12; i++) {
 		min = i;
-		for(int j=i; j<12; j++) {
+		for(int j=i+1; j<12; j++) {
 			if(array[j] < array[min]) {
+				// array[min]: 기준, array[j]: 비교대상
+				// 배열의 시작부터 끝까지 순회하며 j<min인 경우 min값을 j로 초기화함. 
+				// 배열을 초기화하는 것이 아닌 인덱스값을 초기화. 
 				min = j;
 			}
  		}
+ 		//
  		temp = array[min];
  		array[min] = array[i];
  		array[i] = temp;
@@ -56,7 +60,7 @@ void selection_sort(int array[]) {
 }
 
 int main() {
-	int array[12] = {32, 15, 2, 50, 0, 1, 100, 29, 88, 69, 20, 999};
+	int array[12] = {32, 15, 2, 11, 0, 2, 100, 29, 88, 69, 20, 999};
 	selection_sort(array);
 
 	return 0;
