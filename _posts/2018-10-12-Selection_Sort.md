@@ -31,19 +31,43 @@
 #include <stdlib.h>
 #include <time.h>
 
-# define MAX_SIZE 20
+# define MAX_SIZE 25
+# define RAND_RANGE 100
+
+
+// 난수에 매번 다른 시드를 주기 위한 함수 
+void seed_init() {
+	srand((unsigned int)time(NULL));
+} 
 
 // 난수 발생 함수 
-void random_number(int array[], int length) {
-	srand((int)time(NULL));
+void random_number(int *array, int length) {
+	bool overlapCheck = false; // 원소값 중복체크 변수 
+	 
 	for(int i=0; i<length; i++) {
-		array[i] = rand() % 100;
+		while(true) {
+			array[i] = (rand()%RAND_RANGE)+1;
+			overlapCheck = false;
+			
+			for(int j=0; j<i; j++) {
+				if(array[j] == array[i]) {
+					overlapCheck = true;
+					break;
+				}
+			}
+			if(!overlapCheck) {
+				break;
+			}
+		}	
 	}	
 }
 
 // 선택 정렬 
 void selection_sort(int* array, int length) {
 	int i, j, min, temp;
+	
+	random_number(array, length);
+	
 	printf("정렬 전: ");
 	for(i=0; i<length; i++) {
 		printf("%d ", array[i]);
@@ -67,15 +91,19 @@ void selection_sort(int* array, int length) {
 		printf("%d ", array[i]);
 	}
 	
-} 
+}
 
 int main() {
+	clock_t second = 0;
 	int data[MAX_SIZE] = {};
 	int length = sizeof(data)/sizeof(int); // 배열의 크기
+	seed_init();
 	
-	random_number(data, length);
+	second = (int)clock();
+	printf("Selection Sort\n");
 	selection_sort(data, length);
-
+	printf("\n데이터 %d개의 정렬 수행시간: %0.4f초\n", MAX_SIZE, (float)(clock() - second) /CLOCKS_PER_SEC);   //요기까지 걸린 시간은?
+	
 	return 0;
 }
 ```
