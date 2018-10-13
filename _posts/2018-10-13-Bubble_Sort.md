@@ -1,0 +1,119 @@
+# 버블 정렬(Bubble Sort)
+
+- 원소의 이동이 거품이 수면으로 올라오는듯한 모습을 보여 지어진 이름.
+
+- 인접한 두 원소를 검사하여 작은 수를 앞으로 보냄. 각 사이클마다 가장 큰 값이 맨 뒤로 보내짐
+
+- 코드가 단순하기 때문에 자주 사용.
+
+- 내부연산이 가장 비효율적으로, 수행시간이 가장 느린 안좋은 알고리즘
+
+
+## **순서**
+
+1. 주어진 값중 최소값을 찾는다.
+2. 최소값을 맨 앞에 위치한 값과 교체한다
+3. 맨 앞에 위치한 값을 제외한 나머지 값을 같은 방법으로 교체한다
+
+
+
+## 시간복잡도
+
+> 선택 정렬의 시간복잡도는 O(N^2)
+
+- 데이터의 갯수가 N개일 때, N(N+1)/2 번의 연산을 수행함
+- 가장 큰 차수인 N^2만 보고, O(N^2)라 표현함.
+- 어떤 경우에든 정렬되있어도 비교횟수가 같기 때문에, 최악이나 평균시간이나 시간복잡도가 같음.
+- 거품정렬(bubble sort)보다 항상 우수함.
+- 삽입정렬(insetion sort)보다 효율적으로 실행됨
+
+
+
+## 코드
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+# define MAX_SIZE 25
+# define RAND_RANGE 100
+
+
+// 난수에 매번 다른 시드를 주기 위한 함수 
+void seed_init() {
+	srand((unsigned int)time(NULL));
+} 
+
+// 난수 발생 함수 
+void random_number(int *array, int length) {
+	bool overlapCheck = false; // 원소값 중복체크 변수 
+	 
+	for(int i=0; i<length; i++) {
+		while(true) {
+			array[i] = (rand()%RAND_RANGE)+1;
+			overlapCheck = false;
+			
+			for(int j=0; j<i; j++) {
+				if(array[j] == array[i]) {
+					overlapCheck = true;
+					break;
+				}
+			}
+			if(!overlapCheck) {
+				break;
+			}
+		}	
+	}	
+}
+
+// 버블 정렬 
+void bubble_sort(int *array, int length) {
+	int i, j, temp;
+	
+	random_number(array, length);
+	
+	printf("정렬 전: ");
+	for(i=0; i<length; i++) {
+		printf("%d ", array[i]);
+	}
+	
+	for(i=0; i<length; i++) {
+		for(j=0; j<(length-1)-i; j++) {
+			if(array[j] > array[j+1]) {
+				temp = array[j];
+				array[j] = array[j+1];
+				array[j+1] = temp;
+			}
+		}
+	}
+	
+	printf("\n정렬 후: ");
+	for(i=0; i<length; i++) {
+		printf("%d ", array[i]);
+	}
+	
+	
+}
+
+int main() {
+	clock_t second = 0;
+	int data[MAX_SIZE] = {};
+	int length = sizeof(data)/sizeof(int); // 배열의 크기
+	seed_init();
+	
+	second = (int)clock();
+	printf("\n\nBubble Sort\n");
+	bubble_sort(data, length);
+	printf("\n데이터 %d개의 정렬 수행시간: %0.4f초\n", MAX_SIZE, (float)(clock() - second) /CLOCKS_PER_SEC);   //요기까지 걸린 시간은?
+
+
+	return 0;
+}
+```
+
+
+
+## 결과
+
+![bubble_sort](https://i.imgur.com/hs6Z5iS.png) {:.alignleft}
