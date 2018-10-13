@@ -24,6 +24,8 @@
 - 거품정렬(bubble sort)보다 항상 우수함.
 - 삽입정렬(insetion sort)보다 효율적으로 실행됨
 
+
+
 ## 코드
 
 ```c
@@ -108,3 +110,8 @@ int main() {
 }
 ```
 
+
+
+## 결과
+
+![selection_sort](https://i.imgur.com/mMv6ost.png)
