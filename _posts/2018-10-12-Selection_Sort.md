@@ -28,40 +28,53 @@
 
 ```c
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
-void selection_sort(int array[]) {
+# define MAX_SIZE 20
+
+// 난수 발생 함수 
+void random_number(int array[], int length) {
+	srand((int)time(NULL));
+	for(int i=0; i<length; i++) {
+		array[i] = rand() % 100;
+	}	
+}
+
+// 선택 정렬 
+void selection_sort(int* array, int length) {
 	int i, j, min, temp;
 	printf("정렬 전: ");
-	for(i=0; i<12; i++) {
+	for(i=0; i<length; i++) {
 		printf("%d ", array[i]);
 	}
 	
-	for(i=0; i<12; i++) {
+	for(i=0; i<length; i++) {
 		min = i;
-		for(int j=i+1; j<12; j++) {
+		for(int j=i+1; j<length; j++) {
+			// 최솟값 탐색 
 			if(array[j] < array[min]) {
-				// array[min]: 기준, array[j]: 비교대상
-				// 배열의 시작부터 끝까지 순회하며 j<min인 경우 min값을 j로 초기화함. 
-				// 배열을 초기화하는 것이 아닌 인덱스값을 초기화. 
 				min = j;
 			}
  		}
- 		//
  		temp = array[min];
  		array[min] = array[i];
  		array[i] = temp;
 	} 
 	
 	printf("\n정렬 후: "); 
-	for(i=0; i<12; i++) {
+	for(i=0; i<length; i++) {
 		printf("%d ", array[i]);
 	}
 	
-}
+} 
 
 int main() {
-	int array[12] = {32, 15, 2, 11, 0, 2, 100, 29, 88, 69, 20, 999};
-	selection_sort(array);
+	int data[MAX_SIZE] = {};
+	int length = sizeof(data)/sizeof(int); // 배열의 크기
+	
+	random_number(data, length);
+	selection_sort(data, length);
 
 	return 0;
 }
