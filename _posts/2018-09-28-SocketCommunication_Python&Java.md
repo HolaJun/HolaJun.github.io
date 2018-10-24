@@ -18,25 +18,22 @@ result = ''
     MongoDB Connect
 '''
 def mongoConn(fromClientMsg):
-    # 정훈 MongoDB 정보
-    username = 'hoseo777'
-    password = 'hoseo777'
-
-    # 도경 MongoDB 정보
-    #username = 'hoseo_io'
-    #password = 'hoseo93'
+    # MongoDB 정보
+    username = 'hoseo_io'
+    password = 'hoseo93'
 
     # Connect AWS-Mongo
     # 도경서버
     #conn = pymongo.MongoClient('mongodb://%s:%s@222.118.242.165:1993' % (username, password))
-
+    # 아산 자취방 서버
+    #conn = pymongo.MongoClient('mongodb://%s:%s@121.127.181.101:27017' % (username, password))
     # 정훈서버
     #conn = pymongo.MongoClient('mongodb://%s:%s@124.28.41.13:27017' % (username, password))
     conn = pymongo.MongoClient('mongodb://%s:%s@127.0.0.1:27017' % (username, password))
     print('[Log] conn: ', conn)
 
     # Show Database
-    db = conn.database_names()
+    db = conn.list_database_names()
     print('[Log] DB List: ', db)
 
     # Select Database
@@ -51,7 +48,6 @@ def mongoConn(fromClientMsg):
     collection = db.get_collection('stock_list')
     print('[Log] Selected Collection: ', collection)
 
-
     # find()에 인자가 없으면 해당 컬렉션의 전체 데이터 조회. return type = cursor
     search = fromClientMsg
 
@@ -65,14 +61,12 @@ def mongoConn(fromClientMsg):
 
     if not docs:  # 결과값이 없다면
         print("[Log] {0}에 대한 검색 결과가 없습니다.".format(search))
-        result = ''
+        result = 'noValue'
         return result
     else:
         del result['_id']
 
     print('[Log] docs: {0}, type of docs: {1} '.format(docs, type(docs)))
-
-
 
     #endMsgClient = '종목명: {0}\n 시작가: {1}\n 최저가: {2}\n 종가: {3}\n 거래량: {4}'.format(result['item'], result['open'], result['low'], result['close'], result['volume'])
     sendMsgClient = result
@@ -87,16 +81,15 @@ def mongoConn(fromClientMsg):
     #for result in docs:
     #    print(result)
 
-
 def toJson(content):
     result = json.dumps(content)
     result = bytes(result, encoding='utf-8')
     return result
 
+####################################
+####   Socket Communication
+####################################
 
-'''
-    Socket Communication
-'''
 def runServer():
     host = ''  # 지정하지 않으면 가능한 모든 인터페이스를 뜻함
     port = 5555
@@ -111,44 +104,47 @@ def runServer():
     sock.listen(1) # 접속이 있을 때까지 기다림
 
     while True:
-        if conn is None:
-            # 클라이언트측으로부터 소켓 정보 받아옴
-            print('[Log] [연결을 기다리는 중...]')
-            # 접속 승인
-            conn, addr = sock.accept()
-            print('[Log] [연결 완료]')
-            print('[Log] [Conn 정보] ')
-            print('[Log] [클라이언트 정보] ', addr)
-        else:
-            print('[Log] 데이터 수신 대기중 ....')
-            # 클라이언트로부터 받은 메세지
-            fromClientMsg = conn.recv(1024).decode(encoding='utf-8')
-            # 전송받은 메세지 출력
-            print('[Log] 클라이언트로부터 받은 메세지: ', fromClientMsg.strip())
+        # if conn is None:
+        # 클라이언트측으로부터 소켓 정보 받아옴
+        print('[Log] [연결을 기다리는 중...]')
+        # 접속 승인
+        conn, addr = sock.accept()
+        print('[Log] [연결 완료]')
+        print('[Log] [Conn 정보] ')
+        print('[Log] [클라이언트 정보] ', addr)
+        print('[Log] 데이터 수신 대기중 ....')
 
-            resultValue = mongoConn(fromClientMsg)
-            if resultValue == '':
-                toClientMsg = '데이터가 존재하지 않습니다.'
-                conn.sendall(bytes(toClientMsg, encoding='utf-8'))
-                continue
+        # 클라이언트로부터 받은 메세지
+        # 안드로이드에서 데이터 전송받은 경우 맨 뒤에 \n이 붙어서 옴.
+        fromClientMsg = conn.recv(1024).decode(encoding='utf-8').replace('\n', '')
 
-            print('resultVluae: ', resultValue)
+        # 전송받은 메세지 출력
+        print('[Log] 클라이언트로부터 받은 메세지:', fromClientMsg)
+        print('[Log] 메세지크기: ', len(fromClientMsg))
+        print('[Log] 메세지타입:', type(fromClientMsg))
 
-            # 클라이언트측으로 메세지 전송
-            msg = {'item': '우진', 'open': 5350.0, 'low': 5350.0, 'close': 5700.0, 'volume': 612028.0}
-            print('msg의 타입: ', type(msg))
-            print('toJson() 이전의 resultValue 값: {0}, type: {1} '.format(resultValue, type(resultValue)))
-            toClientMsg = toJson(resultValue)
-            conn.sendall(toClientMsg)
-            print('[Log] 클라이언트로 보낸 메세지: ', toClientMsg)
-            print('[Log] toClient Type: ', type(toClientMsg))
-            #if not fromClientMsg: break
+        # mongoConn 함수에 명령어 넣고 결과값 bytes 파일을 return 받음
+        resultValue = mongoConn(fromClientMsg)
+        if resultValue == 'noValue':
+            toClientMsg = '데이터가 존재하지 않습니다.'
+            conn.sendall(bytes(toClientMsg, encoding='utf-8'))
+            continue
+        print('[Log] resultVluae: ', resultValue)
+
+        # 클라이언트측으로 메세지 전송
+        # msg = {'item': '우진', 'open': 5350.0, 'low': 5350.0, 'close': 5700.0, 'volume': 612028.0}
+        # print('msg의 타입: ', type(resultValue))
+        print('toJson() 이전의 resultValue 값: {0}, type: {1} '.format(resultValue, type(resultValue)))
+        toClientMsg = toJson(resultValue)
+        conn.sendall(toClientMsg)
+        print('[Log] 클라이언트로 보낸 메세지: ', toClientMsg)
+        print('[Log] toClient Type: ', type(toClientMsg))
+        # if not fromClientMsg: break
+
     conn.close()
 
 if __name__ == '__main__':
-  runServer()
-
-
+    runServer()
 ```
 
 
@@ -224,7 +220,7 @@ public class SocketSendTest2 {
 ### MainActiity.java
 
 ```java
-package com.example.holajun.sockettest;
+package com.example.holajun.projstock;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -235,6 +231,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -245,11 +242,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
-
-
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
 
 public class MainActivity extends AppCompatActivity {
-    EditText input01;
+    final String severIp = "121.127.181.101";
+    final int serverPort = 5555;
+    EditText txtId;
     TextView resultView;
 
     @Override
@@ -257,34 +256,35 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        input01 = (EditText) findViewById(R.id.input01);
-        Button button01 = (Button) findViewById(R.id.button01);
+        txtId = (EditText) findViewById(R.id.txtId);
+        resultView = (TextView) findViewById(R.id.resultView);
+        Button btnSearch = (Button) findViewById(R.id.btnSearch);
 
-        button01.setOnClickListener(new View.OnClickListener() {
+        btnSearch.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
                 // addr = ip주소
-                String addr = input01.getText().toString().trim();
-                System.out.println("▣ ip값: " + addr);
+                //String addr = severIp.getText().toString().trim();
+                System.out.println("▣ ip값: " + severIp);
+                System.out.println("▣ txtId값: " + txtId.getText().toString());
 
-                ConnectThread thread = new ConnectThread(addr);
+                ConnectThread thread = new ConnectThread(severIp, txtId.getText().toString());
                 thread.start();
             }
         });
-
     }
 
     class ConnectThread extends Thread {
-        String hostname;
+        String hostname, message;
 
-        public ConnectThread(String addr) {
-            hostname = addr;
+        public ConnectThread(String severIp, String txtId) {
+            hostname = severIp;
+            message = txtId;
         }
+
         public void run() {
             try {
-                String str = "[Client Send] helloworld";
-                int port = 5555;
-                Socket sock = new Socket(hostname, port);
+                String str = message.trim();
+                Socket sock = new Socket(hostname, serverPort);
 
                 // 서버로 데이터 보내기
                 BufferedWriter bw = new BufferedWriter(
@@ -298,32 +298,63 @@ public class MainActivity extends AppCompatActivity {
                         new InputStreamReader(sock.getInputStream(), "UTF-8")
                 );
                 String jsonVar = mIn.readLine();
-                jsonVar = "[" + jsonVar + "]";
+                String result = URLDecoder.decode(jsonVar, "utf-8");
 
+//                jsonVar = "[" + jsonVar + "]";
+                System.out.println("▣ jsonVar Decode: " + result);
                 System.out.println("▣ 서버로부터 받은 메세지: " + jsonVar);
-
                 System.out.println("jsonVar: " + jsonVar);
 
                 JsonParser jsonParser = new JsonParser();
-                JsonArray jsonArray = (JsonArray) jsonParser.parse(jsonVar);
+                JsonObject jsonObject = (JsonObject) jsonParser.parse(jsonVar);
 
-                for(int i=0; i<jsonArray.size(); i++) {
-                    JsonObject object = (JsonObject) jsonArray.get(i);
-                    String id = object.get("id").getAsString();
-                    String name = object.get("name").getAsString();
+                JsonElement stockDate = jsonObject.get("date");
+                JsonElement stockItem = jsonObject.get("item");
+                JsonElement stockOpen = jsonObject.get("open");
+                JsonElement stockLow = jsonObject.get("low");
+                JsonElement stockClose = jsonObject.get("close");
+                JsonElement stockVolume = jsonObject.get("volume");
 
-                    System.out.println("[JSON]id: " + id);
-                    System.out.println("[JSON]name: " + name);
-                }
+                String strStockDate = jsonObject.get("date").getAsString();
+                String strStockItem = jsonObject.get("item").getAsString();
+                String strStockOpen = jsonObject.get("open").getAsString();
+                String strStockLow = jsonObject.get("low").getAsString();
+                String strStockClose = jsonObject.get("close").getAsString();
+                String strStockVolume = jsonObject.get("volume").getAsString();
+
+
+                System.out.println("▣ Json date : " + stockDate);
+                System.out.println("▣ Json item : " + stockItem);
+                System.out.println("▣ Json open : " + stockOpen);
+                System.out.println("▣ Json low : " + stockLow);
+                System.out.println("▣ Json close : " + stockClose);
+                System.out.println("▣ Json volume : " + stockVolume);
+
+                resultView.setText(
+                        strStockDate + "\n" +
+                        strStockItem + "\n" +
+                        strStockOpen + "\n" +
+                        strStockLow + "\n" +
+                        strStockClose + "\n" +
+                        strStockVolume + "\n"
+                );
 
 //
+//                JsonArray jsonArray = (JsonArray) jsonParser.parse(jsonVar);
+//
+//                for (int i = 0; i < jsonArray.size(); i++) {
+//                    JsonObject object = (JsonObject) jsonArray.get(i);
+//                    String id = object.get("id").getAsString();
+//                    String name = object.get("name").getAsString();
+//
+//                    System.out.println("[JSON]id: " + id);
+//                    System.out.println("[JSON]name: " + name);
+//                }
+
 //                ObjectInputStream inputStream = new ObjectInputStream(sock.getInputStream());
 //                Object input = inputStream.readObject();
 //                System.out.println("▣ 서버로부터 받은 메세지(ObjectInputStream): " + input);
-
 //                inputStream.close();
-
-
                 sock.close();
             } catch (Exception ex) {
                 ex.printStackTrace();
