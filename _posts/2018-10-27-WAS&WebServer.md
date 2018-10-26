@@ -78,7 +78,7 @@
 
 
 
-### WAS와 Web Server 차이
+# WAS와 Web Server 차이
 
 > WAS(Web Application)은 정적 데이터를, Web Server는 동적 데이터를 처리함.
 
