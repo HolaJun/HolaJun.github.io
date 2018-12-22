@@ -114,3 +114,15 @@ java.lang.NullPointerException
 #### 해결 방법
 
 - Spring 버전을 3.2.9 이상으로 갱신함.
+
+
+
+## Could not delete C:/spring/.metadata/.plugins/org.eclipse.wst.server.core/tmp0/wtpwebapps/HolaJun/WEB-INF/lib. May be locked by another process.
+
+#### 상황
+
+- 톰캣 Start가 안됨
+
+#### 해결 방법
+
+- Project Clean 이후 Tomcat Clean. 그리고 Start
