@@ -126,3 +126,12 @@ java.lang.NullPointerException
 #### 해결 방법
 
 - Project Clean 이후 Tomcat Clean. 그리고 Start
+
+
+
+## Cannot change version of project facet Dynamic Web Module to 2.5
+
+#### 해결 방법
+
+- pom.xml과 web.xml의 module version을 똑같이 맞춰줘야함
+
