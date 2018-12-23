@@ -4,6 +4,10 @@
 
 <br>
 
+[TOC]
+
+<br>
+
 ## java.net.BindException: Address already in use: JVM_Bind
 
 ```c
@@ -127,7 +131,7 @@ java.lang.NullPointerException
 
 - Project Clean 이후 Tomcat Clean. 그리고 Start
 
-
+<br>
 
 ## Cannot change version of project facet Dynamic Web Module to 2.5
 
@@ -135,3 +139,18 @@ java.lang.NullPointerException
 
 - pom.xml과 web.xml의 module version을 똑같이 맞춰줘야함
 
+<br>
+
+## Missing artifact javax.servlet:servlet-api:jar:4.0.0
+
+#### 상황
+
+- servlet-api의 3버전대를 4버전대로 마이그레이션하는 중 오류 발생.
+
+#### 원인
+
+- 기존의 servlet-api는 3버전대와 4버전대의 artifactId가 맞지 않아서 발생한 오류
+
+#### 해결 방법
+
+- 3버전대 artifactId의 servlet-api를 4버전대의 맞게 javax.servlet-api로 변경
