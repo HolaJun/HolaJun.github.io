@@ -154,3 +154,11 @@ java.lang.NullPointerException
 #### 해결 방법
 
 - 3버전대 artifactId의 servlet-api를 4버전대의 맞게 javax.servlet-api로 변경
+
+## [MSSQL]여러 부분으로 구성된 식별자 은(는) 바인딩할 수 없습니다.
+
+#### 원인
+- 테이블의 별칭이 없거나 맞지 않는 경우
+
+#### 해결 방법
+- 테이블 별칭이 존재하는지, 매핑을 잘 시켰는지 확인.
